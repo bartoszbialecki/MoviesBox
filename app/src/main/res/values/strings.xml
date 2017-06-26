@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">MoviesBox</string>
+    <string name="no_movies">No movies</string>
+    <string name="no_network">No internet connection</string>
+    <string name="content_description_image_viewer">Poster preview</string>
+    <string name="content_description_movie_poster_thumbnail">Poster thumbnail</string>
+
+    <string name="title_activity_settings">Settings</string>
+    <string name="pref_sort_orders_label">Show movies</string>
+    <string name="pref_sort_orders_key" translatable="false">sort-orders</string>
+    <string name="pref_sort_orders_label_popular">Popular</string>
+    <string name="pref_sort_orders_label_top_rated">Top-rated</string>
+    <string name="pref_sort_orders_popular" translatable="false">popular</string>
+    <string name="pref_sort_orders_top_rated" translatable="false">top-rated</string>
+
+    <string name="poster_transition_name" translatable="false">poster</string>
+</resources>

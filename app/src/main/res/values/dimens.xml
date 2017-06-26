@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="margin_vsmall">5dp</dimen>
+    <dimen name="margin_small">10dp</dimen>
+    <dimen name="margin_medium">15dp</dimen>
+
+    <dimen name="movie_title_text_size">24sp</dimen>
+    <dimen name="movie_detail_text_size">16sp</dimen>
+
+</resources>
