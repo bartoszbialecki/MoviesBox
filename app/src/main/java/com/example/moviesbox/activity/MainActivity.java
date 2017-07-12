@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements MoviesFragment.On
 
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.movie_detail_container, MovieDetailFragment.newInstance(null), MOVIE_DETAIL_FRAGMENT_TAG)
+                        .replace(R.id.movie_detail_container, MovieDetailFragment.newInstance(), MOVIE_DETAIL_FRAGMENT_TAG)
                         .commit();
             }
         } else {
@@ -87,14 +87,14 @@ public class MainActivity extends AppCompatActivity implements MoviesFragment.On
     @Override
     public void onMovieSelected(Movie movie, ImageView sharedImageView) {
         if (mTwoPane) {
-            MovieDetailFragment fragment = MovieDetailFragment.newInstance(movie);
+            MovieDetailFragment fragment = MovieDetailFragment.newInstance(movie.getId());
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.movie_detail_container, fragment, MOVIE_DETAIL_FRAGMENT_TAG)
                     .commit();
         } else {
             Intent intent = new Intent(this, MovieDetailActivity.class);
-            intent.putExtra(MovieDetailActivity.EXTRA_MOVIE, movie);
+            intent.putExtra(MovieDetailActivity.EXTRA_MOVIE_ID, movie.getId());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 ActivityOptionsCompat options = ActivityOptionsCompat.

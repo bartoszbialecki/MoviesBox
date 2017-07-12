@@ -131,5 +131,16 @@ public class MoviesRepository implements MoviesDataSource {
         mCachedMovies = null;
         mTotalPages = 0;
     }
+
+    @Override
+    public Movie getMovie(int movieId) {
+        for (Movie movie : mCachedMovies) {
+            if (movie.getId() == movieId) {
+                return movie;
+            }
+        }
+
+        return null;
+    }
     // endregion
 }

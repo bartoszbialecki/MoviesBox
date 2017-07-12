@@ -8,12 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.example.moviesbox.R;
+import com.example.moviesbox.data.MoviesRepository;
 import com.example.moviesbox.fragment.MovieDetailFragment;
 import com.example.moviesbox.model.Movie;
 
 public class MovieDetailActivity extends AppCompatActivity {
     // region CONSTANTS
-    public static final String EXTRA_MOVIE = "movie";
+    public static final String EXTRA_MOVIE_ID = "movie_id";
     // endregion
 
     // region VARIABLES
@@ -31,11 +32,13 @@ public class MovieDetailActivity extends AppCompatActivity {
         initArguments();
 
         if (savedInstanceState == null) {
-            MovieDetailFragment fragment = MovieDetailFragment.newInstance(mMovie);
+            if (mMovie != null) {
+                MovieDetailFragment fragment = MovieDetailFragment.newInstance(mMovie.getId());
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.movie_detail_container, fragment)
-                    .commit();
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.movie_detail_container, fragment)
+                        .commit();
+            }
         }
     }
     // endregion
@@ -63,8 +66,12 @@ public class MovieDetailActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
 
         if (null != extras) {
-            if (extras.containsKey(EXTRA_MOVIE)) {
-                mMovie = extras.getParcelable(EXTRA_MOVIE);
+            if (extras.containsKey(EXTRA_MOVIE_ID)) {
+                int movieId = extras.getInt(EXTRA_MOVIE_ID, 0);
+
+                if (movieId > 0) {
+                    mMovie = MoviesRepository.getInstance().getMovie(movieId);
+                }
             }
         }
     }

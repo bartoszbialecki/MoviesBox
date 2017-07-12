@@ -1,5 +1,6 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background">
@@ -60,5 +61,23 @@
             android:layout_below="@+id/poster_image_view"
             android:textSize="@dimen/movie_detail_text_size"
             android:textColor="@color/primaryText" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/overview_text_view"
+            android:layout_marginTop="@dimen/margin_medium"
+            app:tabTextColor="@color/primaryText"
+            app:tabSelectedTextColor="@color/primaryText"
+            app:tabIndicatorColor="@android:color/white"
+            app:tabMode="fixed" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_below="@+id/tabs" />
     </RelativeLayout>
-</ScrollView>
+</android.support.v4.widget.NestedScrollView>

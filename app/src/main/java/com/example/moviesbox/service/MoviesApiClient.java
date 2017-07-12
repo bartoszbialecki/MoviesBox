@@ -2,6 +2,8 @@ package com.example.moviesbox.service;
 
 import com.example.moviesbox.BuildConfig;
 import com.example.moviesbox.model.Movies;
+import com.example.moviesbox.model.Reviews;
+import com.example.moviesbox.model.Trailers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -21,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MoviesApiClient {
     // region CONSTANTS
-    private static final String BASE_URL = "http://api.themoviedb.org/3/";
+    private static final String BASE_URL = "https://api.themoviedb.org/3/";
     private static final int TIMEOUT = 60;
     // endregion
 
@@ -85,6 +87,14 @@ public class MoviesApiClient {
 
     public Single<Movies> getTopRatedMovies(int page, String language) {
         return mService.getTopRatedMovies(page, language);
+    }
+
+    public Single<Reviews> getReviews(int movieId, int page, String language) {
+        return mService.getReviews(movieId, page, language);
+    }
+
+    public Single<Trailers> getTrailers(int movieId, String language) {
+        return mService.getTrailers(movieId, language);
     }
     // endregion
 }

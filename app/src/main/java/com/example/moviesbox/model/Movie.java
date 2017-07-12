@@ -72,6 +72,9 @@ public class Movie implements Parcelable {
     @SerializedName("release_date")
     @Expose
     private Date mReleaseDate;
+
+    private List<Trailer> mTrailers;
+    private List<Review> mReviews;
     // endregion
 
     // region CONSTRUCTORS
@@ -102,6 +105,12 @@ public class Movie implements Parcelable {
         if (releaseTime > 0) {
             mReleaseDate = new Date(releaseTime);
         }
+
+        this.mTrailers = new ArrayList<>();
+        in.readTypedList(mTrailers, Trailer.CREATOR);
+
+        this.mReviews = new ArrayList<>();
+        in.readTypedList(mReviews, Review.CREATOR);
     }
     // endregion
 
@@ -217,6 +226,22 @@ public class Movie implements Parcelable {
     public void setReleaseDate(Date releaseDate) {
         this.mReleaseDate = releaseDate;
     }
+
+    public List<Trailer> getTrailers() {
+        return mTrailers;
+    }
+
+    public void setTrailers(List<Trailer> trailers) {
+        this.mTrailers = trailers;
+    }
+
+    public List<Review> getReviews() {
+        return mReviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.mReviews = reviews;
+    }
     // endregion
 
     // region PARCELABLE METHODS
@@ -241,6 +266,7 @@ public class Movie implements Parcelable {
         parcel.writeByte((byte)(mAdult ? 1 : 0));
         parcel.writeString(mOverview);
         parcel.writeLong(mReleaseDate != null ? mReleaseDate.getTime() : 0);
+        parcel.writeTypedList(mTrailers);
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {

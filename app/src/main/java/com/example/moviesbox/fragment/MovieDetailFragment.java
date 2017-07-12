@@ -5,9 +5,16 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -15,10 +22,13 @@ import android.widget.TextView;
 
 import com.example.moviesbox.R;
 import com.example.moviesbox.activity.ImageViewerActivity;
+import com.example.moviesbox.data.MoviesRepository;
 import com.example.moviesbox.model.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -30,7 +40,7 @@ import butterknife.Unbinder;
  */
 public class MovieDetailFragment extends Fragment {
     // region CONSTANTS
-    private static final String EXTRA_MOVIE = "movie";
+    private static final String EXTRA_MOVIE_ID = "movie_id";
     // endregion
 
     // region VARIABLES
@@ -46,6 +56,10 @@ public class MovieDetailFragment extends Fragment {
     TextView overviewTextView;
     @BindView(R.id.container)
     ViewGroup container;
+    @BindView(R.id.tabs)
+    TabLayout tabLayout;
+    @BindView(R.id.view_pager)
+    ViewPager viewPager;
 
     private Movie mMovie;
     private Unbinder mUnbinder;
@@ -59,12 +73,16 @@ public class MovieDetailFragment extends Fragment {
     // endregion
 
     // region PUBLIC METHODS
-    public static MovieDetailFragment newInstance(Movie movie) {
+    public static MovieDetailFragment newInstance() {
+        return newInstance(0);
+    }
+
+    public static MovieDetailFragment newInstance(int movieId) {
         MovieDetailFragment fragment = new MovieDetailFragment();
         Bundle args = new Bundle();
 
-        if (movie != null) {
-            args.putParcelable(EXTRA_MOVIE, movie);
+        if (movieId > 0) {
+            args.putInt(EXTRA_MOVIE_ID, movieId);
         }
 
         fragment.setArguments(args);
@@ -78,6 +96,8 @@ public class MovieDetailFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+
         mDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
 
         initArguments();
@@ -90,6 +110,7 @@ public class MovieDetailFragment extends Fragment {
 
         mUnbinder = ButterKnife.bind(this, view);
 
+        setupTabs();
         setupUI();
 
         return view;
@@ -103,15 +124,47 @@ public class MovieDetailFragment extends Fragment {
     }
     // endregion
 
+    // region MENU METHODS
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.movie_detail, menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_favorite_action) {
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    // endregion
+
     // region PRIVATE METHODS
     private void initArguments() {
         Bundle bundle = getArguments();
 
         if (bundle != null) {
-            if (bundle.containsKey(EXTRA_MOVIE)) {
-                mMovie = bundle.getParcelable(EXTRA_MOVIE);
+            if (bundle.containsKey(EXTRA_MOVIE_ID)) {
+                int movieId = bundle.getInt(EXTRA_MOVIE_ID, 0);
+
+                if (movieId > 0) {
+                    mMovie = MoviesRepository.getInstance().getMovie(movieId);
+                }
             }
         }
+    }
+
+    private void setupTabs() {
+        PagerAdapter adapter = new PagerAdapter(getChildFragmentManager());
+        adapter.addFragment(MovieTrailersFragment.newInstance(mMovie.getId()), getString(R.string.trailers));
+        adapter.addFragment(MovieReviewsFragment.newInstance(mMovie.getId()), getString(R.string.reviews));
+
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     private void setupUI() {
@@ -152,6 +205,37 @@ public class MovieDetailFragment extends Fragment {
             if (mMovie.getOverview() != null) {
                 overviewTextView.setText(mMovie.getOverview());
             }
+        }
+    }
+    // endregion
+
+    // region INNER CLASSES
+    private static class PagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        private PagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        private void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
         }
     }
     // endregion
