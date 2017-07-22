@@ -23,6 +23,21 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/play_image_view"
         android:layout_toEndOf="@+id/play_image_view"
+        android:layout_toLeftOf="@+id/share_trailer_button"
+        android:layout_toStartOf="@+id/share_trailer_button"
+        android:layout_marginRight="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_medium"
         android:textColor="@color/primaryText"
         android:textSize="@dimen/movie_detail_text_size" />
+
+    <ImageButton
+        android:id="@+id/share_trailer_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:padding="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        app:srcCompat="@drawable/ic_share" />
 </RelativeLayout>

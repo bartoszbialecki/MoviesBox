@@ -19,6 +19,7 @@ import com.example.moviesbox.data.Settings;
 import com.example.moviesbox.model.Movie;
 import com.example.moviesbox.model.Reviews;
 import com.example.moviesbox.service.MoviesApiClient;
+import com.example.moviesbox.util.NetworkUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -102,7 +103,7 @@ public class MovieReviewsFragment extends Fragment {
                 int movieId = bundle.getInt(EXTRA_MOVIE_ID, 0);
 
                 if (movieId > 0) {
-                    mMovie = MoviesRepository.getInstance().getMovie(movieId);
+                    mMovie = MoviesRepository.getInstance(getActivity()).getMovie(movieId);
                 }
             }
         }
@@ -147,27 +148,31 @@ public class MovieReviewsFragment extends Fragment {
     private void getReviews() {
         if (mMovie != null) {
             if (mMovie.getReviews() == null || mMovie.getReviews().size() == 0) {
-                MoviesApiClient.getInstance().getReviews(mMovie.getId(), 1, Settings.getInstance().getCurrentLanguage())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new SingleObserver<Reviews>() {
-                            @Override
-                            public void onSubscribe(@NonNull Disposable d) {
+                if (NetworkUtils.isNetworkAvailable(getActivity())) {
+                    MoviesApiClient.getInstance().getReviews(mMovie.getId(), 1, Settings.getInstance().getCurrentLanguage())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new SingleObserver<Reviews>() {
+                                @Override
+                                public void onSubscribe(@NonNull Disposable d) {
 
-                            }
+                                }
 
-                            @Override
-                            public void onSuccess(@NonNull Reviews reviews) {
-                                mAdapter.addReviews(reviews.getReviews());
-                                mMovie.setReviews(reviews.getReviews());
-                                updateUI();
-                            }
+                                @Override
+                                public void onSuccess(@NonNull Reviews reviews) {
+                                    mAdapter.addReviews(reviews.getReviews());
+                                    mMovie.setReviews(reviews.getReviews());
+                                    updateUI();
+                                }
 
-                            @Override
-                            public void onError(@NonNull Throwable e) {
-                                showErrorMessage(e.getLocalizedMessage());
-                            }
-                        });
+                                @Override
+                                public void onError(@NonNull Throwable e) {
+                                    showErrorMessage(e.getLocalizedMessage());
+                                }
+                            });
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                }
             } else {
                 mAdapter.addReviews(mMovie.getReviews());
                 updateUI();

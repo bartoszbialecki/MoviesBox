@@ -8,6 +8,7 @@
     <string name="pref_sort_orders_label">Pokaż filmy</string>
     <string name="pref_sort_orders_label_popular">Popularne</string>
     <string name="pref_sort_orders_label_top_rated">Najwyżej oceniane</string>
+    <string name="pref_sort_orders_label_favorites">Ulubione</string>
     <string name="title_activity_settings">Ustawienia</string>
     <string name="reviews">Recenzje</string>
     <string name="trailers">Trailery</string>
@@ -15,4 +16,6 @@
     <string name="no_reviews">Brak recenzji</string>
     <string name="add_to_favorites">Dodaj do ulubionych</string>
     <string name="remove_from_favorites">Usuń z ulubionych</string>
+    <string name="share_trailer">Udostępnij trailer</string>
+    <string name="share_trailer_title">Obejrzyj ten trailer</string>
 </resources>

@@ -7,4 +7,5 @@ public interface MoviesPresenter extends BasePresenter<MoviesView> {
     void refreshList();
     void onSortOrderPreferencesChange();
     void onListScrolled();
+    void onMovieChanged(int movieId);
 }

@@ -13,5 +13,8 @@ public interface MoviesView extends BaseView {
     void showEmptyResultsView();
     void hideEmptyResultsView();
     void showErrorMessage(String errorMessage);
+    void showErrorMessage(int messageResourceId);
     void onSortOrderChanged(@MoviesRepository.SortOrder String sortOrder);
+    void stopRefreshing();
+    boolean checkNetworkConnection();
 }

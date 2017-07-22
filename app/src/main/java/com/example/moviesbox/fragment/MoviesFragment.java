@@ -4,14 +4,19 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +27,7 @@ import android.widget.TextView;
 
 import com.example.moviesbox.R;
 import com.example.moviesbox.adapter.MoviesAdapter;
+import com.example.moviesbox.data.MovieContract;
 import com.example.moviesbox.data.MoviesRepository;
 import com.example.moviesbox.data.Settings;
 import com.example.moviesbox.data.SharedPreferencesRepository;
@@ -39,6 +45,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import de.mateware.snacky.Snacky;
 
+import static com.example.moviesbox.data.MoviesRepository.FAVORITES;
 import static com.example.moviesbox.data.MoviesRepository.POPULAR;
 import static com.example.moviesbox.data.MoviesRepository.TOP_RATED;
 
@@ -65,6 +72,7 @@ public class MoviesFragment extends Fragment implements MoviesView, SharedPrefer
     private MoviesPresenter mPresenter;
     private OnMovieSelectedListener mListener;
     private int mCurrentVisiblePosition = -1;
+    private MoviesDbContentObserver mContentObserver;
     // endregion
 
     // region CONSTRUCTORS
@@ -98,12 +106,17 @@ public class MoviesFragment extends Fragment implements MoviesView, SharedPrefer
 
         SharedPreferencesRepository preferencesRepository = new SharedPreferencesRepositoryImpl(getActivity());
         mPresenter = new MoviesPresenterImpl(this, preferencesRepository,
-                MoviesRepository.getInstance(), Settings.getInstance());
+                MoviesRepository.getInstance(getActivity()), Settings.getInstance());
 
         setupUI();
         setupAdapter();
 
         mPresenter.start();
+
+        mContentObserver = new MoviesDbContentObserver(new Handler(Looper.getMainLooper()));
+
+        getContext().getContentResolver().registerContentObserver(MovieContract.MovieEntry.CONTENT_URI,
+                true, mContentObserver);
 
         return view;
     }
@@ -128,11 +141,7 @@ public class MoviesFragment extends Fragment implements MoviesView, SharedPrefer
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (NetworkUtils.isNetworkAvailable(getActivity())) {
-            mPresenter.fetchMovies(false);
-        } else {
-            showNoNetworkConnectionMessage();
-        }
+        mPresenter.fetchMovies(false);
     }
 
     @Override
@@ -148,6 +157,8 @@ public class MoviesFragment extends Fragment implements MoviesView, SharedPrefer
 
         PreferenceManager.getDefaultSharedPreferences(getActivity())
                 .unregisterOnSharedPreferenceChangeListener(this);
+
+        getContext().getContentResolver().unregisterContentObserver(mContentObserver);
 
         mPresenter.stop();
         mUnbinder.unbind();
@@ -237,6 +248,11 @@ public class MoviesFragment extends Fragment implements MoviesView, SharedPrefer
     }
 
     @Override
+    public void showErrorMessage(int messageResourceId) {
+        showErrorMessage(getString(messageResourceId));
+    }
+
+    @Override
     public void onSortOrderChanged(@MoviesRepository.SortOrder String sortOrder) {
         switch (sortOrder) {
             case POPULAR:
@@ -247,7 +263,21 @@ public class MoviesFragment extends Fragment implements MoviesView, SharedPrefer
                 headerTextView.setText(getString(R.string.pref_sort_orders_label_top_rated));
 
                 break;
+            case FAVORITES:
+                headerTextView.setText(getString(R.string.pref_sort_orders_label_favorites));
+
+                break;
         }
+    }
+
+    @Override
+    public boolean checkNetworkConnection() {
+        return NetworkUtils.isNetworkAvailable(getActivity());
+    }
+
+    @Override
+    public void stopRefreshing() {
+        refreshLayout.setRefreshing(false);
     }
     // endregion
 
@@ -281,12 +311,7 @@ public class MoviesFragment extends Fragment implements MoviesView, SharedPrefer
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (NetworkUtils.isNetworkAvailable(getActivity())) {
-                    mPresenter.refreshList();
-                } else {
-                    refreshLayout.setRefreshing(false);
-                    showNoNetworkConnectionMessage();
-                }
+                mPresenter.refreshList();
             }
         });
     }
@@ -336,10 +361,6 @@ public class MoviesFragment extends Fragment implements MoviesView, SharedPrefer
         }
     }
 
-    private void showNoNetworkConnectionMessage() {
-        showErrorMessage(getString(R.string.no_network));
-    }
-
     private int numberOfColumns() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -352,6 +373,36 @@ public class MoviesFragment extends Fragment implements MoviesView, SharedPrefer
         }
 
         return nColumns;
+    }
+    // endregion
+
+    // region INNER CLASSES
+    private class MoviesDbContentObserver extends ContentObserver {
+        public MoviesDbContentObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            this.onChange(selfChange, null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            String movieIdPath = uri.getLastPathSegment();
+
+            if (!TextUtils.isEmpty(movieIdPath)) {
+                try {
+                    int movieId = Integer.parseInt(movieIdPath);
+
+                    if (mAdapter != null) {
+                        mAdapter.updateMovie(movieId);
+                        mPresenter.onMovieChanged(movieId);
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
     }
     // endregion
 }

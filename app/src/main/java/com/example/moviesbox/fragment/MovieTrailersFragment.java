@@ -23,6 +23,7 @@ import com.example.moviesbox.model.Movie;
 import com.example.moviesbox.model.Trailer;
 import com.example.moviesbox.model.Trailers;
 import com.example.moviesbox.service.MoviesApiClient;
+import com.example.moviesbox.util.NetworkUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -107,7 +108,7 @@ public class MovieTrailersFragment extends Fragment {
                 int movieId = bundle.getInt(EXTRA_MOVIE_ID, 0);
 
                 if (movieId > 0) {
-                    mMovie = MoviesRepository.getInstance().getMovie(movieId);
+                    mMovie = MoviesRepository.getInstance(getActivity()).getMovie(movieId);
                 }
             }
         }
@@ -130,6 +131,15 @@ public class MovieTrailersFragment extends Fragment {
 
                 if (trailer != null) {
                     showTrailer(trailer);
+                }
+            }
+
+            @Override
+            public void onShareItemButtonClick(int position) {
+                Trailer trailer = mAdapter.getTrailer(position);
+
+                if (trailer != null) {
+                    shareTrailerUrl(Uri.parse(YOUTUBE_BASE_URL + trailer.getKey()));
                 }
             }
         });
@@ -164,27 +174,31 @@ public class MovieTrailersFragment extends Fragment {
     private void getTrailers() {
         if (mMovie != null) {
             if (mMovie.getTrailers() == null || mMovie.getTrailers().size() == 0) {
-                MoviesApiClient.getInstance().getTrailers(mMovie.getId(), Settings.getInstance().getCurrentLanguage())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new SingleObserver<Trailers>() {
-                            @Override
-                            public void onSubscribe(@NonNull Disposable d) {
+                if (NetworkUtils.isNetworkAvailable(getActivity())) {
+                    MoviesApiClient.getInstance().getTrailers(mMovie.getId(), Settings.getInstance().getCurrentLanguage())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new SingleObserver<Trailers>() {
+                                @Override
+                                public void onSubscribe(@NonNull Disposable d) {
 
-                            }
+                                }
 
-                            @Override
-                            public void onSuccess(@NonNull Trailers trailers) {
-                                mAdapter.addTrailers(trailers.getTrailers());
-                                mMovie.setTrailers(trailers.getTrailers());
-                                updateUI();
-                            }
+                                @Override
+                                public void onSuccess(@NonNull Trailers trailers) {
+                                    mAdapter.addTrailers(trailers.getTrailers());
+                                    mMovie.setTrailers(trailers.getTrailers());
+                                    updateUI();
+                                }
 
-                            @Override
-                            public void onError(@NonNull Throwable e) {
-                                showErrorMessage(e.getLocalizedMessage());
-                            }
-                        });
+                                @Override
+                                public void onError(@NonNull Throwable e) {
+                                    showErrorMessage(e.getLocalizedMessage());
+                                }
+                            });
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                }
             } else {
                 mAdapter.addTrailers(mMovie.getTrailers());
                 updateUI();
@@ -209,6 +223,15 @@ public class MovieTrailersFragment extends Fragment {
                 .setText(errorMessage)
                 .error()
                 .show();
+    }
+
+    private void shareTrailerUrl(Uri uri) {
+        Intent share = new Intent(android.content.Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_trailer_title));
+        share.putExtra(Intent.EXTRA_TEXT, uri.toString());
+
+        startActivity(Intent.createChooser(share, getString(R.string.share_trailer)));
     }
     // endregion
 }

@@ -70,7 +70,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 int movieId = extras.getInt(EXTRA_MOVIE_ID, 0);
 
                 if (movieId > 0) {
-                    mMovie = MoviesRepository.getInstance().getMovie(movieId);
+                    mMovie = MoviesRepository.getInstance(this).getMovie(movieId);
                 }
             }
         }

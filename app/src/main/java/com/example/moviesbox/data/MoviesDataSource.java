@@ -11,4 +11,5 @@ public interface MoviesDataSource {
     Movie getMovie(int movieId);
     boolean canGetMoreMovies();
     void refreshList();
+    void updateMovie(int movieId);
 }

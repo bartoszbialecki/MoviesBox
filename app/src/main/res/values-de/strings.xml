@@ -8,6 +8,7 @@
     <string name="pref_sort_orders_label">Filme anzeigen</string>
     <string name="pref_sort_orders_label_popular">Populär</string>
     <string name="pref_sort_orders_label_top_rated">Bestbewertet</string>
+    <string name="pref_sort_orders_label_favorites">Favoriten</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="reviews">Bewertungen</string>
     <string name="trailers">Vorschaue</string>
@@ -15,4 +16,6 @@
     <string name="no_reviews">Keine Bewertungen</string>
     <string name="add_to_favorites">Zu Favoriten hinzufügen</string>
     <string name="remove_from_favorites">Von Favoriten entfernen</string>
+    <string name="share_trailer">Vorschau teilen</string>
+    <string name="share_trailer_title">Schau mal diesen Vorschau</string>
 </resources>

@@ -67,6 +67,26 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             notifyDataSetChanged();
         }
     }
+
+    public void updateMovie(int movieId) {
+        if (mMovies != null) {
+            int pos = 0;
+
+            for (Movie movie: mMovies) {
+                if (movie.getId() == movieId) {
+                    if (!movie.isFavorite()) {
+                        mMovies.remove(movie);
+                        notifyItemRemoved(pos);
+                        notifyItemRangeChanged(pos, mMovies.size());
+
+                        break;
+                    }
+                }
+
+                pos++;
+            }
+        }
+    }
     // endregion
 
     // region ADAPTER METHODS
@@ -84,7 +104,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         Context context = holder.itemView.getContext();
 
         Picasso.with(context)
-                .load(movie.getPosterPath(false))
+                .load(movie.getPosterFullPath(false))
                 .placeholder(R.color.background)
                 .into(holder.posterImageView);
     }

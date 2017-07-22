@@ -1,5 +1,6 @@
 package com.example.moviesbox.presenter;
 
+import com.example.moviesbox.R;
 import com.example.moviesbox.data.MoviesRepository;
 import com.example.moviesbox.data.Settings;
 import com.example.moviesbox.data.SharedPreferencesRepository;
@@ -47,6 +48,12 @@ public class MoviesPresenterImpl implements MoviesPresenter {
     // region MOVIES PRESENTER
     @Override
     public void fetchMovies(boolean forceLoad) {
+        if (!mMoviesRepository.getSortOrder().equals(MoviesRepository.FAVORITES) && !mView.checkNetworkConnection()) {
+            mView.showErrorMessage(R.string.no_network);
+
+            return;
+        }
+
         mMoviesRepository.getMovies(forceLoad, mSettings.getCurrentLanguage())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -72,6 +79,13 @@ public class MoviesPresenterImpl implements MoviesPresenter {
 
     @Override
     public void refreshList() {
+        if (!mMoviesRepository.getSortOrder().equals(MoviesRepository.FAVORITES) && !mView.checkNetworkConnection()) {
+            mView.showErrorMessage(R.string.no_network);
+            mView.stopRefreshing();
+
+            return;
+        }
+
         mView.clearList();
         mView.showContentLoading();
 
@@ -96,6 +110,11 @@ public class MoviesPresenterImpl implements MoviesPresenter {
         if (mMoviesRepository.canGetMoreMovies()) {
             fetchMovies(true);
         }
+    }
+
+    @Override
+    public void onMovieChanged(int movieId) {
+        mMoviesRepository.updateMovie(movieId);
     }
     // endregion
 

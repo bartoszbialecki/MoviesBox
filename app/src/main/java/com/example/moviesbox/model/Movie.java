@@ -73,11 +73,15 @@ public class Movie implements Parcelable {
     @Expose
     private Date mReleaseDate;
 
+    private boolean mIsFavorite;
+
     private List<Trailer> mTrailers;
     private List<Review> mReviews;
     // endregion
 
     // region CONSTRUCTORS
+    public Movie() {}
+
     public Movie(Parcel in) {
         mVoteCount = in.readInt();
         mId = in.readInt();
@@ -105,6 +109,8 @@ public class Movie implements Parcelable {
         if (releaseTime > 0) {
             mReleaseDate = new Date(releaseTime);
         }
+
+        mIsFavorite = in.readByte() == 1;
 
         this.mTrailers = new ArrayList<>();
         in.readTypedList(mTrailers, Trailer.CREATOR);
@@ -163,8 +169,12 @@ public class Movie implements Parcelable {
         this.mPopularity = popularity;
     }
 
-    public String getPosterPath(boolean large) {
+    public String getPosterFullPath(boolean large) {
         return String.format("%s%s", large ? LARGE_POSTER_BASE_URL : POSTER_BASE_URL, mPosterPath);
+    }
+
+    public String getPosterPath() {
+        return mPosterPath;
     }
 
     public void setPosterPath(String posterPath) {
@@ -227,6 +237,14 @@ public class Movie implements Parcelable {
         this.mReleaseDate = releaseDate;
     }
 
+    public boolean isFavorite() {
+        return mIsFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        mIsFavorite = favorite;
+    }
+
     public List<Trailer> getTrailers() {
         return mTrailers;
     }
@@ -266,7 +284,9 @@ public class Movie implements Parcelable {
         parcel.writeByte((byte)(mAdult ? 1 : 0));
         parcel.writeString(mOverview);
         parcel.writeLong(mReleaseDate != null ? mReleaseDate.getTime() : 0);
+        parcel.writeByte((byte)(mIsFavorite ? 1 : 0));
         parcel.writeTypedList(mTrailers);
+        parcel.writeTypedList(mReviews);
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {

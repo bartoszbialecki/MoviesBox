@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.moviesbox.R;
@@ -30,6 +31,7 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.ViewHo
     // region LISTENERS
     public interface OnItemClickListener {
         void onItemClick(View itemView, int position);
+        void onShareItemButtonClick(int position);
     }
     // endregion
 
@@ -85,6 +87,8 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.ViewHo
     static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.trailer_name_text_view)
         TextView trailerNameTextView;
+        @BindView(R.id.share_trailer_button)
+        ImageButton shareTrailerButton;
 
         private OnItemClickListener mListener;
 
@@ -100,6 +104,15 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.ViewHo
                 public void onClick(View view) {
                     if (mListener != null) {
                         mListener.onItemClick(itemView, getLayoutPosition());
+                    }
+                }
+            });
+
+            shareTrailerButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null) {
+                        mListener.onShareItemButtonClick(getLayoutPosition());
                     }
                 }
             });
