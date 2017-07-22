@@ -214,12 +214,14 @@ public class MovieDetailFragment extends Fragment {
     }
 
     private void setupTabs() {
-        PagerAdapter adapter = new PagerAdapter(getChildFragmentManager());
-        adapter.addFragment(MovieTrailersFragment.newInstance(mMovie.getId()), getString(R.string.trailers));
-        adapter.addFragment(MovieReviewsFragment.newInstance(mMovie.getId()), getString(R.string.reviews));
+        if (mMovie != null) {
+            PagerAdapter adapter = new PagerAdapter(getChildFragmentManager());
+            adapter.addFragment(MovieTrailersFragment.newInstance(mMovie.getId()), getString(R.string.trailers));
+            adapter.addFragment(MovieReviewsFragment.newInstance(mMovie.getId()), getString(R.string.reviews));
 
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
+            viewPager.setAdapter(adapter);
+            tabLayout.setupWithViewPager(viewPager);
+        }
     }
 
     private void setupUI() {

@@ -30,7 +30,8 @@
             android:layout_marginLeft="@dimen/margin_small"
             android:layout_marginStart="@dimen/margin_small"
             android:textSize="@dimen/movie_title_text_size"
-            android:textColor="@color/primaryText" />
+            android:textColor="@color/primaryText"
+            tools:text="Movie Title"/>
 
         <TextView
             android:id="@+id/release_date_text_view"
@@ -41,7 +42,8 @@
             android:layout_alignLeft="@+id/title_text_view"
             android:layout_alignStart="@+id/title_text_view"
             android:textSize="@dimen/movie_detail_text_size"
-            android:textColor="@color/secondaryText" />
+            android:textColor="@color/secondaryText"
+            tools:text="12.12.12"/>
 
         <TextView
             android:id="@+id/vote_average_text_view"
@@ -52,7 +54,9 @@
             android:layout_alignParentEnd="true"
             android:layout_alignBaseline="@id/release_date_text_view"
             android:textSize="@dimen/movie_detail_text_size"
-            android:textColor="@color/primaryText" />
+            android:textColor="@color/primaryText"
+            tools:text="7.5" />
+
         <TextView
             android:id="@+id/overview_text_view"
             android:layout_width="match_parent"

@@ -1,6 +1,5 @@
 package com.example.moviesbox.fragment;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -210,9 +209,9 @@ public class MovieTrailersFragment extends Fragment {
         Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailer.getKey()));
         Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(YOUTUBE_BASE_URL + trailer.getKey()));
 
-        try {
+        if (appIntent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivity(appIntent);
-        } catch (ActivityNotFoundException ex) {
+        } else {
             startActivity(webIntent);
         }
     }

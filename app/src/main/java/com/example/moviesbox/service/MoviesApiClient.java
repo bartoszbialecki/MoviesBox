@@ -82,11 +82,11 @@ public class MoviesApiClient {
     }
 
     public Single<Movies> getPopularMovies(int page, String language) {
-        return mService.getPopularMovies(page, language);
+        return mService.getMovies("popular", page, language);
     }
 
     public Single<Movies> getTopRatedMovies(int page, String language) {
-        return mService.getTopRatedMovies(page, language);
+        return mService.getMovies("top_rated", page, language);
     }
 
     public Single<Reviews> getReviews(int movieId, int page, String language) {
